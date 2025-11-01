@@ -15,6 +15,7 @@ function App() {
   const [snapshots, setSnapshots] = useState([]); // [{value, flows, caps, path}]
   const [stepIndex, setStepIndex] = useState(0);
   const [maxFlow, setMaxFlow] = useState(0);
+  const [minCut, setMinCut] = useState(null);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F2F2F2]">
@@ -54,7 +55,12 @@ function App() {
         {screen === "RESULTS" && (
           <ResultsScreen
             maxFlow={maxFlow}
-            onBack={()=>setScreen("MENU")}
+            nodes={nodes}
+            edges={edges}
+            source={source}
+            sink={sink}
+            minCut={minCut}
+            onBack={() => setScreen("MENU")}
           />
         )}
       </div>
