@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 export default function BuildScreen({
   nodes,
   edges: initialEdges,
@@ -36,7 +38,6 @@ export default function BuildScreen({
     return a.slice(0, k);
   };
 
-  // Limita a máx. 3 salientes por nodo fuente
   function limitOutDegree(edges, maxOut = 3) {
     const bySrc = new Map();
     for (const e of edges) {
@@ -44,8 +45,7 @@ export default function BuildScreen({
       bySrc.get(e.source).push(e);
     }
     const trimmed = [];
-    for (const [src, list] of bySrc.entries()) {
-      // criterio simple: mantener targets "más cercanos"
+    for (const [, list] of bySrc.entries()) {
       const sorted = list.slice().sort((e1, e2) => {
         const t1 = parseInt(e1.target, 10), t2 = parseInt(e2.target, 10);
         return t1 - t2;
@@ -55,11 +55,9 @@ export default function BuildScreen({
     return trimmed;
   }
 
-  // === Capacidades deseadas ===
-  const CAP_MIN = 1;
-  const CAP_MAX = 50;
+  // ====== Capacidades deseadas ======
+  const CAP_MIN = 1, CAP_MAX = 50;
 
-  // Genera entre 1 y 3 salientes por nodo, capacidades 1..50
   function generateEdges1to3(nodes) {
     const COLS = 4;
     const col = (i) => i % COLS;
@@ -70,7 +68,6 @@ export default function BuildScreen({
       const u = nodes[i];
       const cu = col(i);
 
-      // candidatos: solo a la derecha
       const candidates = [];
       for (let j = 0; j < nodes.length; j++) {
         if (col(j) > cu) candidates.push(nodes[j]);
@@ -78,7 +75,6 @@ export default function BuildScreen({
       if (candidates.length === 0) continue;
 
       const k = Math.min(3, randInt(1, 3), candidates.length);
-
       for (const v of sampleNoRep(candidates, k)) {
         const key = `${u}->${v}`;
         if (used.has(key)) continue;
@@ -87,23 +83,26 @@ export default function BuildScreen({
           id: `e${u}_${v}`,
           source: u,
           target: v,
-          capacity: randInt(CAP_MIN, CAP_MAX), // 1..50
+          capacity: randInt(CAP_MIN, CAP_MAX),
         });
       }
     }
     return edges;
   }
 
-  // --- AQUÍ ESTABA EL PROBLEMA ---
-  // Si vienen initialEdges (con capacidades 1..3), ahora:
-  // 1) limitamos out-degree a 3
-  // 2) RE-SORTEAMOS capacidad en 1..50 para cada arista
-  const edges = initialEdges.length
-    ? limitOutDegree(initialEdges, 3).map((e) => ({
+  // 🔒 Fijar aristas y capacidades: solo cambian si cambian nodes o initialEdges
+  const edges = useMemo(() => {
+    if (initialEdges && initialEdges.length) {
+      return limitOutDegree(initialEdges, 3).map((e) => ({
         ...e,
-        capacity: randInt(CAP_MIN, CAP_MAX),
-      }))
-    : generateEdges1to3(nodes);
+        capacity:
+          e.capacity != null
+            ? Math.max(CAP_MIN, Math.min(CAP_MAX, Math.round(e.capacity)))
+            : randInt(CAP_MIN, CAP_MAX), // si venía sin capacidad, la sorteamos una vez
+      }));
+    }
+    return generateEdges1to3(nodes);
+  }, [initialEdges, nodes]); // <-- NO depende de source/sink
 
   // ====== Selección S/T ======
   const handleLeftClick = (id) => { if (id !== sink) onPickS(id); };
