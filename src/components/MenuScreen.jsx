@@ -2,6 +2,8 @@ import { useState } from "react";
 
 export default function MenuScreen({ onGenerate }) {
   const [count, setCount] = useState(16);
+  const MIN_NODES = 8;
+  const MAX_NODES = 16;
 
   const generate = () => {
     const n = count;
@@ -42,11 +44,23 @@ export default function MenuScreen({ onGenerate }) {
       <div className="mb-6">
         <div className="mb-10 text-[24px]">Selecciona el número de nodos</div>
         <div className="flex items-center justify-center">
-          <button className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer" onClick={()=>setCount(c=>Math.max(4,c-1))}><i className="fa-solid fa-minus"></i></button>
+          <button 
+            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
+            onClick={()=>setCount(c=>Math.max(MIN_NODES,c-1))}
+            disabled={count <= MIN_NODES}
+          >
+            <i className="fa-solid fa-minus"></i>
+          </button>
           <div className="flex flex-col items-center justify-center w-[200px] h-[55px] bg-[#D3CEF2]">
             <div className="text-[20px]">{count}</div>
           </div>
-          <button className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer" onClick={()=>setCount(c=>c+1)}><i className="fa-solid fa-plus"></i></button>
+          <button 
+            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
+            onClick={()=>setCount(c=>Math.min(MAX_NODES,c+1))}
+            disabled={count >= MAX_NODES}
+          >
+            <i className="fa-solid fa-plus"></i>
+          </button>
         </div>
       </div>
 
