@@ -1,45 +1,50 @@
 import { useState } from "react";
 
-export default function MenuScreen({ onGenerate, onManual }) {
-  const [count, setCount] = useState(16);
-  const MIN_NODES = 8;
-  const MAX_NODES = 16;
+export default function MenuScreen({ alGenerar, alManual }) {
+  const [cantidad, setCantidad] = useState(16);
+  const MIN_NODOS = 8;
+  const MAX_NODOS = 16;
 
-  const generateRandom = () => {
-    const n = count;
-    const nodes = Array.from({length:n}, (_,i)=>String(i+1));
-    const cols = 4;
-    const perCol = Math.ceil(n/cols);
-    const colOf = (i)=> Math.min(Math.floor(i/perCol), cols-1);
+  const generarAleatorio = () => {
+    const n = cantidad;
+    const nodos = Array.from({ length: n }, (_, i) => String(i + 1));
+    const columnas = 4;
+    const porColumna = Math.ceil(n / columnas);
+    const columnaDe = (i) => Math.min(Math.floor(i / porColumna), columnas - 1);
 
-    const edges = [];
-    for (let i=0;i<n;i++){
-      for (let j=i+1;j<n;j++){
-        if (colOf(i) < colOf(j) && Math.random() < 0.35){
-          edges.push({
-            id:`e${i+1}_${j+1}`,
-            source:String(i+1),
-            target:String(j+1),
-            capacity: 1 + Math.floor(Math.random()*10)
+    const aristas = [];
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        if (columnaDe(i) < columnaDe(j) && Math.random() < 0.35) {
+          aristas.push({
+            id: `e${i + 1}_${j + 1}`,
+            origen: String(i + 1),
+            destino: String(j + 1),
+            capacidad: 1 + Math.floor(Math.random() * 10),
           });
         }
       }
     }
-    if (edges.length===0) {
-      for (let c=0;c<cols-1;c++){
-        const u = String(c*perCol+1);
-        const v = String((c+1)*perCol+1);
-        edges.push({id:`e${u}_${v}`, source:u, target:v, capacity:5});
+    if (aristas.length === 0) {
+      for (let c = 0; c < columnas - 1; c++) {
+        const u = String(c * porColumna + 1);
+        const v = String((c + 1) * porColumna + 1);
+        aristas.push({ id: `e${u}_${v}`, origen: u, destino: v, capacidad: 5 });
       }
-      edges.push({id:`e${(cols-1)*perCol+1}_${n}`, source:String((cols-1)*perCol+1), target:String(n), capacity:5});
+      aristas.push({
+        id: `e${(columnas - 1) * porColumna + 1}_${n}`,
+        origen: String((columnas - 1) * porColumna + 1),
+        destino: String(n),
+        capacidad: 5,
+      });
     }
-    onGenerate(nodes, edges);
+    alGenerar(nodos, aristas);
   };
 
-  const generateManual = () => {
-    const n = count;
-    const nodes = Array.from({length:n}, (_,i)=>String(i+1));
-    onManual(nodes);
+  const generarManual = () => {
+    const n = cantidad;
+    const nodos = Array.from({ length: n }, (_, i) => String(i + 1));
+    alManual(nodos);
   };
 
   return (
@@ -50,20 +55,20 @@ export default function MenuScreen({ onGenerate, onManual }) {
       <div className="mb-6">
         <div className="mb-10 text-[24px]">Selecciona el número de nodos:</div>
         <div className="flex items-center justify-center">
-          <button 
-            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
-            onClick={()=>setCount(c=>Math.max(MIN_NODES,c-1))}
-            disabled={count <= MIN_NODES}
+          <button
+            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed"
+            onClick={() => setCantidad((c) => Math.max(MIN_NODOS, c - 1))}
+            disabled={cantidad <= MIN_NODOS}
           >
             <i className="fa-solid fa-minus"></i>
           </button>
           <div className="flex flex-col items-center justify-center w-[200px] h-[55px] bg-[#D3CEF2]">
-            <div className="text-[22px] font-[600]">{count}</div>
+            <div className="text-[22px] font-[600]">{cantidad}</div>
           </div>
-          <button 
-            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
-            onClick={()=>setCount(c=>Math.min(MAX_NODES,c+1))}
-            disabled={count >= MAX_NODES}
+          <button
+            className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed"
+            onClick={() => setCantidad((c) => Math.min(MAX_NODOS, c + 1))}
+            disabled={cantidad >= MAX_NODOS}
           >
             <i className="fa-solid fa-plus"></i>
           </button>
@@ -72,15 +77,15 @@ export default function MenuScreen({ onGenerate, onManual }) {
 
       <div className="mb-10 text-[24px]">Selecciona el modo de generación:</div>
       <div className="gap-4 flex justify-center">
-        <button 
-          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer" 
-          onClick={generateRandom}
+        <button
+          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer"
+          onClick={generarAleatorio}
         >
           Aleatoria
         </button>
-        <button 
-          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer" 
-          onClick={generateManual}
+        <button
+          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer"
+          onClick={generarManual}
         >
           Manual
         </button>

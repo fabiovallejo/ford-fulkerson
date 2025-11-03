@@ -1,63 +1,63 @@
 import { useMemo } from "react";
 import GraphCanvas from "./GraphCanvas.jsx";
-import { calculateLayout, calculatePositions } from "./layoutUtils.js";
+import { calcularDisposicion, calcularPosiciones } from "./layoutUtils.js";
 
 export default function BuildScreen({
-  nodes,
-  edges: initialEdges,
-  source,
-  sink,
-  onPickS,
-  onPickT,
-  onBack,
-  onRun,
+  nodos,
+  aristas: aristasIniciales,
+  fuente,
+  sumidero,
+  alSeleccionarFuente,
+  alSeleccionarSumidero,
+  alVolver,
+  alEjecutar,
 }) {
-  const VB_W = 1800, VB_H = 700;
-  const CAP_MIN = 1, CAP_MAX = 50;
+  const ANCHO_VISTA = 1800, ALTO_VISTA = 700;
+  const CAPACIDAD_MIN = 1, CAPACIDAD_MAX = 50;
   
-  const layout = useMemo(() => calculateLayout(nodes.length, VB_W, VB_H), [nodes.length]);
-  const pos = useMemo(() => calculatePositions(nodes, layout), [nodes, layout]);
+  const disposicion = useMemo(() => calcularDisposicion(nodos.length, ANCHO_VISTA, ALTO_VISTA), [nodos.length]);
+  const posiciones = useMemo(() => calcularPosiciones(nodos, disposicion), [nodos, disposicion]);
 
   // Generar aristas si no existen
-  const edges = useMemo(() => {
-    if (initialEdges?.length) {
+  const aristas = useMemo(() => {
+    if (aristasIniciales?.length) {
       // Limitar y normalizar capacidades de aristas existentes
-      return initialEdges.slice(0, nodes.length * 3).map(e => ({
-        ...e,
-        capacity: Math.max(CAP_MIN, Math.min(CAP_MAX, Math.round(e.capacity ?? Math.random() * 49 + 1)))
+      return aristasIniciales.slice(0, nodos.length * 3).map(arista => ({
+        ...arista,
+        capacidad: Math.max(CAPACIDAD_MIN, Math.min(CAPACIDAD_MAX, Math.round(arista.capacidad ?? Math.random() * 49 + 1)))
       }));
     }
     
     // Generar aristas aleatorias
-    const { cols } = layout;
-    const edges = [];
-    const used = new Set();
+    const { columnas } = disposicion;
+    const aristas = [];
+    const usadas = new Set();
     
-    nodes.forEach((u, i) => {
-      const sourceCol = i % cols;
-      const targetCandidates = nodes.filter((_, j) => j % cols > sourceCol);
+    nodos.forEach((nodoOrigen, indice) => {
+      const columnaOrigen = indice % columnas;
+      const candidatosDestino = nodos.filter((_, j) => j % columnas > columnaOrigen);
       
-      if (targetCandidates.length) {
-        const numEdges = Math.min(3, 1 + Math.floor(Math.random() * 3), targetCandidates.length);
-        const selected = targetCandidates.sort(() => 0.5 - Math.random()).slice(0, numEdges);
+      if (candidatosDestino.length) {
+        const numeroAristas = Math.min(3, 1 + Math.floor(Math.random() * 3), candidatosDestino.length);
+        const seleccionados = candidatosDestino.sort(() => 0.5 - Math.random()).slice(0, numeroAristas);
         
-        selected.forEach(v => {
-          const key = `${u}->${v}`;
-          if (!used.has(key)) {
-            used.add(key);
-            edges.push({
-              id: `e${u}_${v}`,
-              source: u,
-              target: v,
-              capacity: Math.floor(Math.random() * 50) + 1
+        seleccionados.forEach(nodoDestino => {
+          const clave = `${nodoOrigen}->${nodoDestino}`;
+          if (!usadas.has(clave)) {
+            usadas.add(clave);
+            aristas.push({
+              id: `e${nodoOrigen}_${nodoDestino}`,
+              origen: nodoOrigen,
+              destino: nodoDestino,
+              capacidad: Math.floor(Math.random() * 50) + 1
             });
           }
         });
       }
     });
     
-    return edges;
-  }, [initialEdges, nodes, layout]);
+    return aristas;
+  }, [aristasIniciales, nodos, disposicion]);
 
   return (
     <div className="w-screen min-h-screen bg-[#F2F2F2] flex flex-col">
@@ -69,31 +69,31 @@ export default function BuildScreen({
 
       <div className="flex-1 p-4">
         <GraphCanvas
-          nodes={nodes}
-          edges={edges}
-          source={source}
-          sink={sink}
-          pos={pos}
-          onNodeClick={(id) => id !== sink && onPickS(id)}
-          onNodeRightClick={(e, id) => {
-            e.preventDefault();
-            id !== source && onPickT(id);
+          nodos={nodos}
+          aristas={aristas}
+          fuente={fuente}
+          sumidero={sumidero}
+          posiciones={posiciones}
+          alClickNodo={(id) => id !== sumidero && alSeleccionarFuente(id)}
+          alClickDerechoNodo={(evento, id) => {
+            evento.preventDefault();
+            id !== fuente && alSeleccionarSumidero(id);
           }}
-          isInteractive={true}
+          esInteractivo={true}
         />
       </div>
 
       <div className="flex justify-between items-center bg-[#295BF2] px-10 py-5">
         <button 
           className="rounded-lg bg-[#0511F2] px-6 py-3 text-[#F2F2F2] text-lg font-medium hover:bg-[#234bc4] hover:cursor-pointer transition-all duration-300" 
-          onClick={onBack}
+          onClick={alVolver}
         >
           ← Volver al menú
         </button>
         <button 
           className="rounded-lg bg-[#0511F2] px-6 py-3 text-[#F2F2F2] text-lg font-medium hover:bg-[#234bc4] hover:cursor-pointer transition-all duration-300 disabled:opacity-50 disabled:hover:bg-[#0511F2] disabled:cursor-not-allowed" 
-          disabled={!source || !sink} 
-          onClick={onRun}
+          disabled={!fuente || !sumidero} 
+          onClick={alEjecutar}
         >
           Ejecutar Ford–Fulkerson →
         </button>

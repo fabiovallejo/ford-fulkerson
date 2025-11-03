@@ -1,35 +1,35 @@
 // src/utils/layoutUtils.js
-export function calculateLayout(nodeCount, VB_W = 1800, VB_H = 700) {
-  const PAD_X = 120, PAD_Y = 80;
+export function calcularDisposicion(cantidadNodos, ANCHO_VISTA = 1800, ALTO_VISTA = 700) {
+  const MARGEN_X = 120, MARGEN_Y = 80;
   
   // Determinar columnas según cantidad de nodos
-  let cols;
-  if (nodeCount <= 9) cols = 3;
-  else if (nodeCount <= 12) cols = 3;
-  else cols = 4;
+  let columnas;
+  if (cantidadNodos <= 9) columnas = 3;
+  else if (cantidadNodos <= 12) columnas = 3;
+  else columnas = 4;
   
-  const rows = Math.ceil(nodeCount / cols);
+  const filas = Math.ceil(cantidadNodos / columnas);
   
-  const innerW = VB_W - PAD_X * 2;
-  const innerH = VB_H - PAD_Y * 2;
+  const anchoInterior = ANCHO_VISTA - MARGEN_X * 2;
+  const altoInterior = ALTO_VISTA - MARGEN_Y * 2;
   
-  const stepX = cols > 1 ? innerW / (cols - 1) : 0;
-  const stepY = rows > 1 ? innerH / (rows - 1) : 0;
+  const pasoX = columnas > 1 ? anchoInterior / (columnas - 1) : 0;
+  const pasoY = filas > 1 ? altoInterior / (filas - 1) : 0;
   
-  return { cols, rows, PAD_X, PAD_Y, stepX, stepY };
+  return { columnas, filas, MARGEN_X, MARGEN_Y, pasoX, pasoY };
 }
 
-export function calculatePositions(nodes, layout) {
-  const p = {};
-  const { cols, PAD_X, PAD_Y, stepX, stepY } = layout;
+export function calcularPosiciones(nodos, disposicion) {
+  const posiciones = {};
+  const { columnas, MARGEN_X, MARGEN_Y, pasoX, pasoY } = disposicion;
   
-  nodes.forEach((id, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    p[id] = { 
-      x: PAD_X + col * stepX, 
-      y: PAD_Y + row * stepY 
+  nodos.forEach((id, indice) => {
+    const columna = indice % columnas;
+    const fila = Math.floor(indice / columnas);
+    posiciones[id] = { 
+      x: MARGEN_X + columna * pasoX, 
+      y: MARGEN_Y + fila * pasoY 
     };
   });
-  return p;
+  return posiciones;
 }

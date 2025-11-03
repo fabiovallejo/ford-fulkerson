@@ -1,35 +1,35 @@
 export default function GraphCanvas({ 
-  nodes, 
-  edges, 
-  source, 
-  sink, 
-  flow = null, 
-  currentPath = [], 
-  pos, 
-  onNodeClick, 
-  onNodeRightClick, 
-  isInteractive = true 
+  nodos, 
+  aristas, 
+  fuente, 
+  sumidero, 
+  flujo = null, 
+  caminoActual = [], 
+  posiciones, 
+  alClickNodo, 
+  alClickDerechoNodo, 
+  esInteractivo = true 
 }) {
-  const NODE_R = 28;
-  const ARROW_LEN = 3;
-  const START_GAP = 3;
-  const END_GAP = NODE_R + ARROW_LEN + 2;
-  const LABEL_DIST = 80;
-  const LABEL_OFF = -12;
+  const RADIO_NODO = 28;
+  const LONGITUD_FLECHA = 3;
+  const ESPACIO_INICIO = 3;
+  const ESPACIO_FIN = RADIO_NODO + LONGITUD_FLECHA + 2;
+  const DISTANCIA_ETIQUETA = 80;
+  const DESPLAZAMIENTO_ETIQUETA = -12;
 
-  const VB_W = 1800, VB_H = 700;
+  const ANCHO_VISTA = 1800, ALTO_VISTA = 700;
 
-  const key = (u, v) => `${u}->${v}`;
+  const crearClave = (origen, destino) => `${origen}->${destino}`;
   
-  const isInPathForward = (u, v) =>
-    currentPath.some(seg => seg.dir === "f" && seg.u === u && seg.v === v);
+  const estaEnCaminoAdelante = (origen, destino) =>
+    caminoActual.some(segmento => segmento.direccion === "f" && segmento.origen === origen && segmento.destino === destino);
 
-  const backSegments = currentPath.filter(seg => seg.dir === "b");
+  const segmentosAtras = caminoActual.filter(segmento => segmento.direccion === "b");
 
   return (
     <svg
       className="w-full h-full rounded-xl"
-      viewBox={`0 0 ${VB_W} ${VB_H}`}
+      viewBox={`0 0 ${ANCHO_VISTA} ${ALTO_VISTA}`}
       preserveAspectRatio="xMidYMid meet"
     >
       <defs>
@@ -42,77 +42,77 @@ export default function GraphCanvas({
       </defs>
 
       {/* Aristas */}
-      {edges.map((e) => {
-        const a = pos[e.source], b = pos[e.target];
-        if (!a || !b) return null;
+      {aristas.map((arista) => {
+        const puntoA = posiciones[arista.origen], puntoB = posiciones[arista.destino];
+        if (!puntoA || !puntoB) return null;
 
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len, uy = dy / len;
-        const nx = -uy, ny = ux;
+        const deltaX = puntoB.x - puntoA.x, deltaY = puntoB.y - puntoA.y;
+        const longitud = Math.hypot(deltaX, deltaY) || 1;
+        const unitarioX = deltaX / longitud, unitarioY = deltaY / longitud;
+        const normalX = -unitarioY, normalY = unitarioX;
 
-        const sx = a.x + ux * (NODE_R + START_GAP);
-        const sy = a.y + uy * (NODE_R + START_GAP);
-        const ex = b.x - ux * END_GAP;
-        const ey = b.y - uy * END_GAP;
+        const inicioX = puntoA.x + unitarioX * (RADIO_NODO + ESPACIO_INICIO);
+        const inicioY = puntoA.y + unitarioY * (RADIO_NODO + ESPACIO_INICIO);
+        const finX = puntoB.x - unitarioX * ESPACIO_FIN;
+        const finY = puntoB.y - unitarioY * ESPACIO_FIN;
 
-        const lx = a.x + ux * LABEL_DIST + nx * LABEL_OFF;
-        const ly = a.y + uy * LABEL_DIST + ny * LABEL_OFF;
+        const etiquetaX = puntoA.x + unitarioX * DISTANCIA_ETIQUETA + normalX * DESPLAZAMIENTO_ETIQUETA;
+        const etiquetaY = puntoA.y + unitarioY * DISTANCIA_ETIQUETA + normalY * DESPLAZAMIENTO_ETIQUETA;
 
-        const f = flow ? (flow.get(key(e.source, e.target)) || 0) : null;
-        const inPath = flow ? isInPathForward(e.source, e.target) : false;
+        const flujoActual = flujo ? (flujo.get(crearClave(arista.origen, arista.destino)) || 0) : null;
+        const enCamino = flujo ? estaEnCaminoAdelante(arista.origen, arista.destino) : false;
 
-        const capStr = f !== null ? `${f}/${e.capacity}` : `${e.capacity}`;
-        const chipW = Math.max(32, 16 + capStr.length * 8);
-        const chipH = 22;
+        const textoCapacidad = flujoActual !== null ? `${flujoActual}/${arista.capacidad}` : `${arista.capacidad}`;
+        const anchoChip = Math.max(32, 16 + textoCapacidad.length * 8);
+        const altoChip = 22;
 
         return (
-          <g key={e.id}>
+          <g key={arista.id}>
             <line
-              x1={sx} y1={sy} x2={ex} y2={ey}
-              stroke={inPath ? "#2563eb" : "#555"}
-              strokeWidth={inPath ? 3.5 : 2}
-              markerEnd={`url(#${inPath ? "arrowBlue" : "arrow"})`}
+              x1={inicioX} y1={inicioY} x2={finX} y2={finY}
+              stroke={enCamino ? "#2563eb" : "#555"}
+              strokeWidth={enCamino ? 3.5 : 2}
+              markerEnd={`url(#${enCamino ? "arrowBlue" : "arrow"})`}
             />
             <rect
-              x={lx - chipW / 2}
-              y={ly - chipH / 2 - 1}
-              width={chipW}
-              height={chipH}
+              x={etiquetaX - anchoChip / 2}
+              y={etiquetaY - altoChip / 2 - 1}
+              width={anchoChip}
+              height={altoChip}
               rx="5" ry="5"
-              fill={inPath ? "#DBEAFE" : "#F8FAFC"}
-              stroke={inPath ? "#2563eb" : "#CBD5E1"}
-              strokeWidth={inPath ? 1.5 : 1}
+              fill={enCamino ? "#DBEAFE" : "#F8FAFC"}
+              stroke={enCamino ? "#2563eb" : "#CBD5E1"}
+              strokeWidth={enCamino ? 1.5 : 1}
             />
             <text
-              x={lx} y={ly + 4} textAnchor="middle"
-              className={`select-none ${inPath ? "fill-blue-700" : "fill-gray-800"}`}
+              x={etiquetaX} y={etiquetaY + 4} textAnchor="middle"
+              className={`select-none ${enCamino ? "fill-blue-700" : "fill-gray-800"}`}
               style={{ fontSize: 15, fontWeight: 700 }}
             >
-              {capStr}
+              {textoCapacidad}
             </text>
           </g>
         );
       })}
 
       {/* Segmentos hacia atrás */}
-      {backSegments.map((seg, i) => {
-        const a = pos[seg.u], b = pos[seg.v];
-        if (!a || !b) return null;
+      {segmentosAtras.map((segmento, indice) => {
+        const puntoA = posiciones[segmento.origen], puntoB = posiciones[segmento.destino];
+        if (!puntoA || !puntoB) return null;
 
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len, uy = dy / len;
+        const deltaX = puntoB.x - puntoA.x, deltaY = puntoB.y - puntoA.y;
+        const longitud = Math.hypot(deltaX, deltaY) || 1;
+        const unitarioX = deltaX / longitud, unitarioY = deltaY / longitud;
 
-        const sx = a.x + ux * (NODE_R + START_GAP);
-        const sy = a.y + uy * (NODE_R + START_GAP);
-        const ex = b.x - ux * END_GAP;
-        const ey = b.y - uy * END_GAP;
+        const inicioX = puntoA.x + unitarioX * (RADIO_NODO + ESPACIO_INICIO);
+        const inicioY = puntoA.y + unitarioY * (RADIO_NODO + ESPACIO_INICIO);
+        const finX = puntoB.x - unitarioX * ESPACIO_FIN;
+        const finY = puntoB.y - unitarioY * ESPACIO_FIN;
 
         return (
           <line
-            key={`back-${i}`}
-            x1={sx} y1={sy} x2={ex} y2={ey}
+            key={`atras-${indice}`}
+            x1={inicioX} y1={inicioY} x2={finX} y2={finY}
             stroke="#2563eb" strokeWidth="3.5"
             strokeDasharray="8,4"
             markerEnd="url(#arrowBlue)"
@@ -121,43 +121,43 @@ export default function GraphCanvas({
       })}
 
       {/* Nodos */}
-      {nodes.map((id) => {
-        const p = pos[id];
-        if (!p) return null;
+      {nodos.map((id) => {
+        const posicion = posiciones[id];
+        if (!posicion) return null;
         
-        const isS = id === source;
-        const isT = id === sink;
-        const fill = isS ? "#D3CEF2" : isT ? "#295BF2" : "#91B2F2";
-        const strokeColor = isS ? "#8B5CF6" : isT ? "#1E40AF" : "#3B82F6";
+        const esFuente = id === fuente;
+        const esSumidero = id === sumidero;
+        const colorRelleno = esFuente ? "#D3CEF2" : esSumidero ? "#295BF2" : "#91B2F2";
+        const colorBorde = esFuente ? "#8B5CF6" : esSumidero ? "#1E40AF" : "#3B82F6";
 
         return (
           <g 
             key={id} 
-            className={isInteractive ? "cursor-pointer" : "cursor-default"}
-            onClick={isInteractive ? () => onNodeClick?.(id) : undefined}
-            onContextMenu={isInteractive ? (e) => onNodeRightClick?.(e, id) : undefined}
+            className={esInteractivo ? "cursor-pointer" : "cursor-default"}
+            onClick={esInteractivo ? () => alClickNodo?.(id) : undefined}
+            onContextMenu={esInteractivo ? (evento) => alClickDerechoNodo?.(evento, id) : undefined}
           >
             <circle 
-              cx={p.x} 
-              cy={p.y} 
-              r={NODE_R} 
-              fill={fill} 
-              stroke={strokeColor}
-              strokeWidth={isS || isT ? 3 : 2}
+              cx={posicion.x} 
+              cy={posicion.y} 
+              r={RADIO_NODO} 
+              fill={colorRelleno} 
+              stroke={colorBorde}
+              strokeWidth={esFuente || esSumidero ? 3 : 2}
             />
             <text 
-              x={p.x} 
-              y={p.y + 6} 
+              x={posicion.x} 
+              y={posicion.y + 6} 
               textAnchor="middle"
               className="fill-black select-none pointer-events-none"
               style={{ fontSize: 17, fontWeight: 700 }}
             >
               {id}
             </text>
-            {isS && (
+            {esFuente && (
               <text 
-                x={p.x} 
-                y={p.y - NODE_R - 8} 
+                x={posicion.x} 
+                y={posicion.y - RADIO_NODO - 8} 
                 textAnchor="middle"
                 className="fill-purple-600 select-none pointer-events-none"
                 style={{ fontSize: 14, fontWeight: 600 }}
@@ -165,10 +165,10 @@ export default function GraphCanvas({
                 Fuente
               </text>
             )}
-            {isT && (
+            {esSumidero && (
               <text 
-                x={p.x} 
-                y={p.y - NODE_R - 8} 
+                x={posicion.x} 
+                y={posicion.y - RADIO_NODO - 8} 
                 textAnchor="middle"
                 className="fill-blue-800 select-none pointer-events-none"
                 style={{ fontSize: 14, fontWeight: 600 }}

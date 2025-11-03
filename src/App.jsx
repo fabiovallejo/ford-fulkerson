@@ -7,86 +7,86 @@ import ResultsScreen from "./components/ResultsScreen"
 import './global.css'
 
 function App() {
-  const [screen, setScreen] = useState("MENU");
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-  const [source, setSource] = useState(null);
-  const [sink, setSink] = useState(null);
-  const [maxFlow, setMaxFlow] = useState(0);
-  const [minCut, setMinCut] = useState(null);
+  const [pantalla, setPantalla] = useState("MENU");
+  const [nodos, setNodos] = useState([]);
+  const [aristas, setAristas] = useState([]);
+  const [fuente, setFuente] = useState(null);
+  const [sumidero, setSumidero] = useState(null);
+  const [flujoMaximo, setFlujoMaximo] = useState(0);
+  const [corteMinimo, setCorteMinimo] = useState(null);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <div className='min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-[#D3CEF2] via-[#F2F2F2] to-[#91B2F2]'>
-        {screen === "MENU" && (
+        {pantalla === "MENU" && (
           <MenuScreen
-            onGenerate={(ns, es) => {
-              setNodes(ns); 
-              setEdges(es);
-              setSource(null); 
-              setSink(null);
-              setMaxFlow(0);
-              setMinCut(null);
-              setScreen("BUILD");
+            alGenerar={(ns, es) => {
+              setNodos(ns); 
+              setAristas(es);
+              setFuente(null); 
+              setSumidero(null);
+              setFlujoMaximo(0);
+              setCorteMinimo(null);
+              setPantalla("BUILD");
             }}
-            onManual={(ns) => {
-              setNodes(ns);
-              setEdges([]);
-              setSource(null); 
-              setSink(null);
-              setMaxFlow(0);
-              setMinCut(null);
-              setScreen("MANUAL_BUILD");
+            alManual={(ns) => {
+              setNodos(ns);
+              setAristas([]);
+              setFuente(null); 
+              setSumidero(null);
+              setFlujoMaximo(0);
+              setCorteMinimo(null);
+              setPantalla("MANUAL_BUILD");
             }}
           />
         )}
 
-        {screen === "MANUAL_BUILD" && (
+        {pantalla === "MANUAL_BUILD" && (
           <ManualBuildScreen
-            nodes={nodes}
-            onBack={() => setScreen("MENU")}
-            onContinue={(es) => {
-              setEdges(es);
-              setScreen("BUILD");
+            nodos={nodos}
+            alVolver={() => setPantalla("MENU")}
+            alContinuar={(es) => {
+              setAristas(es);
+              setPantalla("BUILD");
             }}
           />
         )}
 
-        {screen === "BUILD" && (
+        {pantalla === "BUILD" && (
           <BuildScreen
-            nodes={nodes} 
-            edges={edges} 
-            source={source} 
-            sink={sink}
-            onPickS={(s) => setSource(String(s))}
-            onPickT={(t) => setSink(String(t))}
-            onBack={() => setScreen("MENU")}
-            onRun={() => setScreen("RUN")}
+            nodos={nodos} 
+            aristas={aristas} 
+            fuente={fuente} 
+            sumidero={sumidero}
+            alSeleccionarFuente={(s) => setFuente(String(s))}
+            alSeleccionarSumidero={(t) => setSumidero(String(t))}
+            alVolver={() => setPantalla("MENU")}
+            alEjecutar={() => setPantalla("RUN")}
           />
         )}
 
-        {screen === "RUN" && (
+        {pantalla === "RUN" && (
           <RunScreen
-            nodes={nodes} 
-            edges={edges} 
-            source={source} 
-            sink={sink}
-            onBackToMenu={() => setScreen("MENU")}
-            onResults={() => setScreen("RESULTS")}
-            setMaxFlow={setMaxFlow}
-            setMinCut={setMinCut}
+            nodos={nodos} 
+            aristas={aristas} 
+            fuente={fuente} 
+            sumidero={sumidero}
+            alVolverMenu={() => setPantalla("MENU")}
+            alResultados={() => setPantalla("RESULTS")}
+            establecerFlujoMaximo={setFlujoMaximo}
+            establecerCorteMinimo={setCorteMinimo}
           />
         )}
 
-        {screen === "RESULTS" && (
+        {pantalla === "RESULTS" && (
           <ResultsScreen
-            maxFlow={maxFlow}
-            nodes={nodes}
-            edges={edges}
-            source={source}
-            sink={sink}
-            minCut={minCut}
-            onBack={() => setScreen("MENU")}
+            flujoMaximo={flujoMaximo}
+            nodos={nodos}
+            aristas={aristas}
+            fuente={fuente}
+            sumidero={sumidero}
+            corteMinimo={corteMinimo}
+            alVolver={() => setPantalla("MENU")}
           />
         )}
       </div>
