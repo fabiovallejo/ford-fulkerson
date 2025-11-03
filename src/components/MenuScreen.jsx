@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-export default function MenuScreen({ onGenerate }) {
+export default function MenuScreen({ onGenerate, onManual }) {
   const [count, setCount] = useState(16);
   const MIN_NODES = 8;
   const MAX_NODES = 16;
 
-  const generate = () => {
+  const generateRandom = () => {
     const n = count;
     const nodes = Array.from({length:n}, (_,i)=>String(i+1));
     const cols = 4;
@@ -36,13 +36,19 @@ export default function MenuScreen({ onGenerate }) {
     onGenerate(nodes, edges);
   };
 
+  const generateManual = () => {
+    const n = count;
+    const nodes = Array.from({length:n}, (_,i)=>String(i+1));
+    onManual(nodes);
+  };
+
   return (
-    <div className="rounded-xl text-center bg-[#F2F2F2]">
-      <h1 className="text-[40px] font-bold">Problema del Flujo Máximo</h1>
-      <p className="text-gray-600 text-[32px] mb-12">Algoritmo de Ford–Fulkerson</p>
+    <div className="rounded-xl text-center">
+      <h1 className="text-[40px] font-[600]">Problema del Flujo Máximo</h1>
+      <p className="font-[300] text-[32px] mb-12">Algoritmo de Ford–Fulkerson</p>
 
       <div className="mb-6">
-        <div className="mb-10 text-[24px]">Selecciona el número de nodos</div>
+        <div className="mb-10 text-[24px]">Selecciona el número de nodos:</div>
         <div className="flex items-center justify-center">
           <button 
             className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
@@ -52,7 +58,7 @@ export default function MenuScreen({ onGenerate }) {
             <i className="fa-solid fa-minus"></i>
           </button>
           <div className="flex flex-col items-center justify-center w-[200px] h-[55px] bg-[#D3CEF2]">
-            <div className="text-[20px]">{count}</div>
+            <div className="text-[22px] font-[600]">{count}</div>
           </div>
           <button 
             className="rounded bg-[#295BF2] hover:bg-[#0511F2] transition-all duration-500 text-[#F2F2F2] text-[20px] w-[65px] h-[55px] hover:cursor-pointer disabled:cursor-not-allowed" 
@@ -64,11 +70,21 @@ export default function MenuScreen({ onGenerate }) {
         </div>
       </div>
 
-    <div className="mb-10 text-[24px]">Selecciona el modo de generación</div>
-    <div className="gap-15 flex justify-center">
-        <button className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px]  hover:cursor-pointer" onClick={generate}>Aleatoria</button>
-        <button className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer" onClick={generate}>Manual</button>
-    </div>
+      <div className="mb-10 text-[24px]">Selecciona el modo de generación:</div>
+      <div className="gap-4 flex justify-center">
+        <button 
+          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer" 
+          onClick={generateRandom}
+        >
+          Aleatoria
+        </button>
+        <button 
+          className="w-[200px] h-[55px] rounded-md bg-[#0511F2] hover:bg-[#295BF2] transition-all duration-500 text-[#F2F2F2] text-[24px] hover:cursor-pointer" 
+          onClick={generateManual}
+        >
+          Manual
+        </button>
+      </div>
     </div>
   );
 }

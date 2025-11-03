@@ -28,7 +28,7 @@ export default function GraphCanvas({
 
   return (
     <svg
-      className="w-full h-full bg-[#F2F2F2] rounded-xl"
+      className="w-full h-full rounded-xl"
       viewBox={`0 0 ${VB_W} ${VB_H}`}
       preserveAspectRatio="xMidYMid meet"
     >
