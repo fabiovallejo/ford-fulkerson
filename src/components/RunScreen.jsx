@@ -166,8 +166,8 @@ export default function RunScreen({
             fuente={fuente}
             sumidero={sumidero}
             posiciones={posiciones}
-            alClickNodo={pasoActual.flujo}
-            alClickDerechoNodo={pasoActual.camino}
+            flujo={pasoActual.flujo}
+            caminoActual={pasoActual.camino}
             esInteractivo={false}
           />
           

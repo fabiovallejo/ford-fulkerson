@@ -22,9 +22,9 @@ export default function GraphCanvas({
   const crearClave = (origen, destino) => `${origen}->${destino}`;
   
   const estaEnCaminoAdelante = (origen, destino) =>
-    caminoActual.some(segmento => segmento.direccion === "f" && segmento.origen === origen && segmento.destino === destino);
+    caminoActual.some(segmento => segmento.dir === "f" && segmento.u === origen && segmento.v === destino);
 
-  const segmentosAtras = caminoActual.filter(segmento => segmento.direccion === "b");
+  const segmentosAtras = caminoActual.filter(segmento => segmento.dir === "b");
 
   return (
     <svg
@@ -97,7 +97,8 @@ export default function GraphCanvas({
 
       {/* Segmentos hacia atrás */}
       {segmentosAtras.map((segmento, indice) => {
-        const puntoA = posiciones[segmento.origen], puntoB = posiciones[segmento.destino];
+        // ✅ CORREGIDO: usa .u y .v
+        const puntoA = posiciones[segmento.u], puntoB = posiciones[segmento.v];
         if (!puntoA || !puntoB) return null;
 
         const deltaX = puntoB.x - puntoA.x, deltaY = puntoB.y - puntoA.y;
