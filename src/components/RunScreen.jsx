@@ -172,25 +172,61 @@ export default function RunScreen({
           />
           
           {finalizado && enUltimoPaso && datosCorteMinimo && (
-            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid meet">
-              {datosCorteMinimo.aristasCorte.map((a, idx) => {
+          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid meet">
+            {(() => {
+              if (datosCorteMinimo.aristasCorte.length === 0) return null;
+              
+              let sumaX = 0, sumaY = 0;
+              datosCorteMinimo.aristasCorte.forEach(a => {
                 const p1 = posiciones[a.origen], p2 = posiciones[a.destino];
-                if (!p1 || !p2) return null;
-                
-                const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
-                const dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
-                const nx = -dy / len, ny = dx / len, cutLen = 40;
-                
-                return (
-                  <g key={`cut-${idx}`}>
-                    <line x1={midX - nx * cutLen} y1={midY - ny * cutLen} x2={midX + nx * cutLen} y2={midY + ny * cutLen} stroke="#DC2626" strokeWidth="5" strokeLinecap="round" />
-                    <circle cx={midX - nx * cutLen} cy={midY - ny * cutLen} r="4" fill="#DC2626" />
-                    <circle cx={midX + nx * cutLen} cy={midY + ny * cutLen} r="4" fill="#DC2626" />
-                  </g>
-                );
-              })}
-            </svg>
-          )}
+                if (p1 && p2) {
+                  sumaX += (p1.x + p2.x) / 2;
+                  sumaY += (p1.y + p2.y) / 2;
+                }
+              });
+              
+              const centroX = sumaX / datosCorteMinimo.aristasCorte.length;
+              
+              return (
+                <g>
+                  <line 
+                    x1={centroX} 
+                    y1={50} 
+                    x2={centroX} 
+                    y2={VB_H - 50} 
+                    stroke="#DC2626" 
+                    strokeWidth="4" 
+                    strokeDasharray="10,5"
+                    opacity="0.7"
+                  />
+                  
+                  {datosCorteMinimo.aristasCorte.map((a, idx) => {
+                    const p1 = posiciones[a.origen], p2 = posiciones[a.destino];
+                    if (!p1 || !p2) return null;
+                    
+                    const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
+                    
+                    return (
+                      <g key={`cut-mark-${idx}`}>
+                        <text x={midX} y={midY + 4} textAnchor="middle" className="fill-white font-bold" style={{ fontSize: 12 }}></text>
+                      </g>
+                    );
+                  })}
+                  
+                  <text
+                    x={centroX}
+                    y={30}
+                    textAnchor="middle"
+                    className="fill-red-600 font-bold"
+                    style={{ fontSize: 20 }}
+                  >
+                    CORTE MÍNIMO
+                  </text>
+                </g>
+              );
+            })()}
+          </svg>
+        )}
         </div>
       </div>
 
