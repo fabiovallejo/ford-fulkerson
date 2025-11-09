@@ -172,61 +172,85 @@ export default function RunScreen({
           />
           
           {finalizado && enUltimoPaso && datosCorteMinimo && (
-          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid meet">
-            {(() => {
-              if (datosCorteMinimo.aristasCorte.length === 0) return null;
-              
-              let sumaX = 0, sumaY = 0;
-              datosCorteMinimo.aristasCorte.forEach(a => {
-                const p1 = posiciones[a.origen], p2 = posiciones[a.destino];
-                if (p1 && p2) {
-                  sumaX += (p1.x + p2.x) / 2;
-                  sumaY += (p1.y + p2.y) / 2;
+            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid meet">
+              {(() => {
+                if (datosCorteMinimo.aristasCorte.length === 0) return null;
+                
+                let sumaX = 0, sumaY = 0;
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                
+                datosCorteMinimo.aristasCorte.forEach(a => {
+                  const p1 = posiciones[a.origen], p2 = posiciones[a.destino];
+                  if (p1 && p2) {
+                    const midX = (p1.x + p2.x) / 2;
+                    const midY = (p1.y + p2.y) / 2;
+                    sumaX += midX;
+                    sumaY += midY;
+                    
+                    minX = Math.min(minX, p1.x, p2.x);
+                    maxX = Math.max(maxX, p1.x, p2.x);
+                    minY = Math.min(minY, p1.y, p2.y);
+                    maxY = Math.max(maxY, p1.y, p2.y);
+                  }
+                });
+                
+                const centroX = sumaX / datosCorteMinimo.aristasCorte.length;
+                const centroY = sumaY / datosCorteMinimo.aristasCorte.length;
+                
+                const rangoX = maxX - minX;
+                const rangoY = maxY - minY;
+                
+                const esCorteHorizontal = rangoY > rangoX;
+                
+                let lineaX1, lineaY1, lineaX2, lineaY2;
+                let etiquetaX, etiquetaY;
+                
+                if (esCorteHorizontal) {
+                  // Línea HORIZONTAL
+                  lineaX1 = 50;
+                  lineaY1 = centroY;
+                  lineaX2 = VB_W - 50;
+                  lineaY2 = centroY;
+                  etiquetaX = VB_W / 2;
+                  etiquetaY = centroY - 15;
+                } else {
+                  // Línea VERTICAL
+                  lineaX1 = centroX;
+                  lineaY1 = 50;
+                  lineaX2 = centroX;
+                  lineaY2 = VB_H - 50;
+                  etiquetaX = centroX;
+                  etiquetaY = 30;
                 }
-              });
-              
-              const centroX = sumaX / datosCorteMinimo.aristasCorte.length;
-              
-              return (
-                <g>
-                  <line 
-                    x1={centroX} 
-                    y1={50} 
-                    x2={centroX} 
-                    y2={VB_H - 50} 
-                    stroke="#DC2626" 
-                    strokeWidth="4" 
-                    strokeDasharray="10,5"
-                    opacity="0.7"
-                  />
-                  
-                  {datosCorteMinimo.aristasCorte.map((a, idx) => {
-                    const p1 = posiciones[a.origen], p2 = posiciones[a.destino];
-                    if (!p1 || !p2) return null;
+                
+                return (
+                  <g>
+                    <line 
+                      x1={lineaX1} 
+                      y1={lineaY1} 
+                      x2={lineaX2} 
+                      y2={lineaY2} 
+                      stroke="#DC2626" 
+                      strokeWidth="4" 
+                      strokeDasharray="10,5"
+                      opacity="0.7"
+                    />
                     
-                    const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
-                    
-                    return (
-                      <g key={`cut-mark-${idx}`}>
-                        <text x={midX} y={midY + 4} textAnchor="middle" className="fill-white font-bold" style={{ fontSize: 12 }}></text>
-                      </g>
-                    );
-                  })}
-                  
-                  <text
-                    x={centroX}
-                    y={30}
-                    textAnchor="middle"
-                    className="fill-red-600 font-bold"
-                    style={{ fontSize: 20 }}
-                  >
-                    CORTE MÍNIMO
-                  </text>
-                </g>
-              );
-            })()}
-          </svg>
-        )}
+                    <text
+                      x={etiquetaX}
+                      y={etiquetaY}
+                      textAnchor="middle"
+                      className="fill-red-600 font-bold"
+                      style={{ fontSize: 20 }}
+                    >
+                      CORTE MÍNIMO
+                    </text>
+                  </g>
+                );
+              })()}
+            </svg>
+          )}
         </div>
       </div>
 

@@ -30,7 +30,6 @@ export default function ResultsScreen({
 
   return (
     <div className="w-screen min-h-screen bg-[#F2F2F2] flex flex-col">
-      {/* Header */}
       <div className="flex items-center justify-center bg-[#295BF2] w-full py-6">
         <div className="text-[#F2F2F2] text-[25px] font-bold text-center px-4">
           NODO FUENTE: {fuente}
@@ -39,10 +38,8 @@ export default function ResultsScreen({
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-13">
         <div className="max-w-5xl w-full bg-white rounded-2xl shadow-2xl p-12">
-          {/* Mensaje de finalización */}
           <div className="text-center mb-8">
             <p className="text-[23px] text-gray-700 mb-2">
               Ya no hay más caminos por explorar.
@@ -52,9 +49,7 @@ export default function ResultsScreen({
             </h2>
           </div>
 
-          {/* Ecuaciones y resultados */}
           <div className="space-y-4 mb-7">
-            {/* Flujo neto */}
             <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg">
               <p className="text-xl text-[#0511F2] mb-2 font-semibold">
                 Flujo neto a través del corte (S, T)
@@ -65,7 +60,6 @@ export default function ResultsScreen({
               </p>
             </div>
 
-            {/* Capacidad del corte */}
             <div className="bg-blue-50  border-l-4 border-blue-600 p-6 rounded-lg">
               <p className="text-xl text-[#0511F2] mb-2 font-semibold">
                 Capacidad del corte (S, T)
@@ -76,7 +70,6 @@ export default function ResultsScreen({
               </p>
             </div>
 
-            {/* Conjuntos S y T */}
             <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg">
               <p className="text-xl text-[#0511F2] mb-2 font-semibold">
                 Partición del corte mínimo:
@@ -124,7 +117,6 @@ export default function ResultsScreen({
         </div>
       </div>
 
-      {/* Footer */}
       <div className="flex justify-center bg-[#295BF2] px-10 py-6">
         <button
           className="rounded-lg bg-[#0511F2] px-8 py-4 text-[#F2F2F2] text-xl font-medium hover:bg-[#234bc4] hover:cursor-pointer transition-all duration-300 shadow-lg"

@@ -97,7 +97,6 @@ export default function GraphCanvas({
 
       {/* Segmentos hacia atrás */}
       {segmentosAtras.map((segmento, indice) => {
-        // ✅ CORREGIDO: usa .u y .v
         const puntoA = posiciones[segmento.u], puntoB = posiciones[segmento.v];
         if (!puntoA || !puntoB) return null;
 

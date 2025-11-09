@@ -1,4 +1,3 @@
-// src/utils/layoutUtils.js
 export function calcularDisposicion(cantidadNodos, ANCHO_VISTA = 1800, ALTO_VISTA = 700) {
   const MARGEN_X = 120, MARGEN_Y = 80;
   
